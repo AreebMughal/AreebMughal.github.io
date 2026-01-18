@@ -1,21 +1,43 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## FOLIO
+# My Portfolio
 
-[Live Demo](https://ayushsingh.co.in/)
+Welcome to my portfolio website! This is a modern, beautifully designed platform to showcase my professional work, projects, and experience.
 
-To cater to my goal of having my own portfolio website since 2016 🚀
+Here you'll find:
 
-## How did I create this?
+- 💼 My professional background and experience
+- 🚀 Projects I've built and contributed to
+- 🎯 My skills and technical expertise
+- 📱 A glimpse into my professional journey
 
-1. UI/UX is brainstormed using inspiration from winning portfolios from awwwards. High-fidelity mockup aggregating the ideas using Figma.
-2. This project uses React for simplicity to break down sections as components. Also uses next.js to achieve SSG. SVGs have been animated using CSS.
-3. Section scrolling and reveal animations uses GSAP. Card interactions use Tilt js. The timeline section was built using JS/SVGs and animated via GSAP.
-4. Optimised animations, layer management, repaints, and re-layouts using Chrome dev tools.
+## Tech Stack
 
-## How to run on local?
+- **Framework:** Next.js 12
+- **UI Library:** React 17
+- **Styling:** Tailwind CSS, SCSS
+- **Animations:** GSAP, Vanilla Tilt, Typed.js
+- **Language:** TypeScript
+- **Build Tool:** PostCSS, Autoprefixer
 
-First, run the development server:
+## Getting Started
+
+### Prerequisites
+
+- Node.js 14+ and npm/yarn installed
+
+### Installation & Running Locally
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
@@ -23,13 +45,45 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-## Forked Versions from Community
+### Build for Production
 
-Vue JS implemetation by sjtuli: [filio-vue](https://github.com/sjtuli/filio-vue)
-Same template with a slightly different flavor by shubh73: [devfolio](https://github.com/shubh73/devfolio)
+```bash
+npm run build
+npm start
+```
 
-## A note on re-sharing
+## Project Structure
 
-I have been refining the project using 7+ years of my learnings. While I appreciate the beauty of open source, due credits to the project will be appreciated if you plan to re-share the template. Copyright headers with author name should be included under the forked versions as well. Happy coding :)
+```
+components/
+├── common/        # Reusable components (Button, Header, Footer, etc.)
+└── home/          # Home page sections (Hero, About, Projects, Skills, etc.)
+pages/             # Next.js pages
+public/            # Static assets (images, fonts)
+styles/            # Global styles
+```
+
+## Customization
+
+- Edit component files in the `components/` folder to customize sections
+- Modify colors and styling in `tailwind.config.js` and SCSS modules
+- Update content in component files with your own information
+- Replace images in the `public/` folder with your own assets
+
+## Credits
+
+This portfolio is based on the [Folio](https://github.com/ayush-sharma/ayush-sharma-portfolio) template by [Ayush Singh](https://ayushsingh.co.in/).
+
+**Original Project:** [github.com/ayush-sharma/ayush-sharma-portfolio](https://github.com/ayush-sharma/ayush-sharma-portfolio)
+
+The original project demonstrates excellent UI/UX design principles and advanced animation techniques. Visit the original repository to see the portfolio that inspired this fork.
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+**Note:** Please remember to credit the original author (Ayush Singh) if you fork or re-share this template. Happy coding! 🚀
