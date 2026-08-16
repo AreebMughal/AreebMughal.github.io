@@ -6,11 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fetch:stats": "node scripts/fetch-github-stats.mjs",
+    "export": "next build && next export",
+    "deploy:build": "npm run fetch:stats && npm run export && touch out/.nojekyll"
   },
   "dependencies": {
     "gsap": "3.8.0",
-    "next": "12",
+    "next": "^12.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sass": "^1.32.12",

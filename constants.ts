@@ -1,11 +1,62 @@
 import { ESKILLS } from 'enum';
+import githubStats from './data/github-stats.json';
 
 export const METADATA = {
   title: 'Areeb Arshad | Portfolio',
   description:
     'I architect powerful backend systems that drive seamless user experiences, connecting logic, data, and design into scalable solutions.',
-  siteUrl: 'https://www.areebarshad.me/'
+  siteUrl: 'https://areebmughal.github.io/',
+  previewImage: 'https://areebmughal.github.io/preview.png'
 };
+
+export const GITHUB_USERNAME = 'AreebMughal';
+
+export interface GithubDay {
+  date: string;
+  count: number;
+}
+
+export interface GithubLanguage {
+  name: string;
+  color: string;
+  percent: number;
+}
+
+export interface GithubActivityItem {
+  type: string;
+  label: string;
+  title: string;
+  repo: string;
+  url: string;
+  date: string;
+}
+
+export interface GithubStats {
+  username: string;
+  name: string;
+  profileUrl: string;
+  generatedAt: string | null;
+  totals: {
+    contributionsAllTime: number;
+    contributionsLatestYear: number;
+    latestYear: number;
+    commits: number;
+    pullRequests: number;
+    issues: number;
+    reviews: number;
+    repositories: number;
+    stars: number;
+    followers: number;
+    currentStreak: number;
+    longestStreak: number;
+  };
+  weeks: GithubDay[][];
+  languages: GithubLanguage[];
+  activity: GithubActivityItem[];
+}
+
+/** Regenerated on every deploy by scripts/fetch-github-stats.mjs. */
+export const GITHUB_STATS = githubStats as GithubStats;
 
 export const MENULINKS = [
   {
@@ -23,6 +74,10 @@ export const MENULINKS = [
   {
     name: 'Timeline',
     ref: 'timeline'
+  },
+  {
+    name: 'GitHub',
+    ref: 'github'
   },
   {
     name: 'Contact',

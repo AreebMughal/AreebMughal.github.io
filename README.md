@@ -4,21 +4,25 @@
 
 Welcome to my portfolio website! This is a modern, beautifully designed platform to showcase my professional work, projects, and experience.
 
+**Live at [areebmughal.github.io](https://areebmughal.github.io)**
+
 Here you'll find:
 
 - 💼 My professional background and experience
 - 🚀 Projects I've built and contributed to
 - 🎯 My skills and technical expertise
+- 📊 Live GitHub contribution stats, refreshed on every deploy
 - 📱 A glimpse into my professional journey
 
 ## Tech Stack
 
-- **Framework:** Next.js 12
+- **Framework:** Next.js 12 (static export)
 - **UI Library:** React 17
 - **Styling:** Tailwind CSS, SCSS
 - **Animations:** GSAP, Vanilla Tilt, Typed.js
 - **Language:** TypeScript
 - **Build Tool:** PostCSS, Autoprefixer
+- **Hosting:** GitHub Pages via GitHub Actions
 
 ## Getting Started
 
@@ -54,16 +58,57 @@ npm run build
 npm start
 ```
 
+To produce the exact static bundle that gets deployed:
+
+```bash
+npm run export     # -> ./out
+```
+
 ## Project Structure
 
 ```
+.github/workflows/ # GitHub Pages build & deploy
 components/
 ├── common/        # Reusable components (Button, Header, Footer, etc.)
-└── home/          # Home page sections (Hero, About, Projects, Skills, etc.)
+└── home/          # Home page sections (Hero, About, Projects, GitHub stats, etc.)
+data/              # Generated GitHub stats snapshot
 pages/             # Next.js pages
 public/            # Static assets (images, fonts)
+scripts/           # Build-time data fetchers
 styles/            # Global styles
 ```
+
+## GitHub Stats Section
+
+The **GitHub Activity** section (contribution heatmap, streak tiles, language
+breakdown and recent activity) is real data, not an embedded image.
+
+`scripts/fetch-github-stats.mjs` queries the GitHub GraphQL and REST APIs and
+writes `data/github-stats.json`, which `constants.ts` imports at build time. The
+workflow runs it before every build and on a daily cron, so the site stays
+current without needing a commit.
+
+Refresh it locally with a token that has `read:user`:
+
+```bash
+GITHUB_TOKEN=ghp_xxx npm run fetch:stats
+```
+
+Without a token the script logs a warning, exits cleanly, and the committed
+snapshot is used — local builds never break.
+
+**Private contributions:** the workflow's built-in `GITHUB_TOKEN` only sees
+public activity. To include private contributions, create a personal access
+token with `read:user` and add it as the repository secret `GH_STATS_TOKEN`; the
+workflow prefers it when present.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which fetches fresh
+stats, runs `next build && next export`, and publishes `out/` to GitHub Pages.
+
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub
+Actions**.
 
 ## Customization
 

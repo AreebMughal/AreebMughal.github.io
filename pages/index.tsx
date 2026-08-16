@@ -18,6 +18,7 @@ import Footer from '@/components/common/footer';
 import TimelineSection from '@/components/home/timeline';
 import Scripts from '@/components/common/scripts';
 import AboutSection from '@/components/home/about';
+import GithubStatsSection from '@/components/home/github-stats';
 
 const DEBOUNCE_TIME = 100;
 
@@ -76,6 +77,7 @@ export default function Home() {
           <QuoteSection />
           <SkillsSection />
           <TimelineSection isDesktop={isDesktop} />
+          <GithubStatsSection />
           <CollaborationSection />
           <Footer />
         </main>

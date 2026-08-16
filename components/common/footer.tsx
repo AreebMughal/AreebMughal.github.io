@@ -37,7 +37,7 @@ const Footer = () => {
     </>
   );
 
-  const { ref: footerRef } = MENULINKS[4];
+  const { ref: footerRef } = MENULINKS[5];
 
   return (
     <footer className="w-full relative select-none bg-cover flex flex-col items-stretch" id={footerRef}>
