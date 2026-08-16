@@ -63,6 +63,10 @@ const PROFILE_QUERY = `
         totalCount
         nodes {
           name
+          nameWithOwner
+          url
+          description
+          pushedAt
           stargazerCount
           languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
             edges {
@@ -176,6 +180,11 @@ const ACTIVITY_BUILDERS = {
     label: `${event.payload.action === 'closed' ? 'Merged' : 'Opened'} a pull request`,
     title: event.payload.pull_request?.title ?? ''
   }),
+  PullRequestReviewEvent: (event) => ({
+    type: 'pull-request',
+    label: 'Reviewed a pull request',
+    title: event.payload.pull_request?.title ?? ''
+  }),
   IssuesEvent: (event) => ({
     type: 'issue',
     label: `${event.payload.action === 'closed' ? 'Closed' : 'Opened'} an issue`,
@@ -188,8 +197,14 @@ const ACTIVITY_BUILDERS = {
   WatchEvent: (event) => ({ type: 'star', label: 'Starred a repository', title: event.repo.name.split('/')[1] })
 };
 
-const buildActivity = (events) =>
-  events
+/**
+ * The public events feed only exposes public activity and lags by a few
+ * minutes, so it is regularly empty for accounts that work mostly in private
+ * repos. Top the list up with the most recently pushed public repos so the
+ * panel always has something truthful to show.
+ */
+const buildActivity = (events, repos) => {
+  const fromEvents = events
     .map((event) => {
       const built = ACTIVITY_BUILDERS[event.type]?.(event);
       if (!built || !built.title) return null;
@@ -201,8 +216,24 @@ const buildActivity = (events) =>
         date: event.created_at
       };
     })
-    .filter(Boolean)
-    .slice(0, MAX_ACTIVITY);
+    .filter(Boolean);
+
+  const seenRepos = new Set(fromEvents.map((item) => item.repo));
+
+  const fromRepos = repos
+    .filter((repo) => repo.pushedAt && !seenRepos.has(repo.nameWithOwner))
+    .sort((a, b) => b.pushedAt.localeCompare(a.pushedAt))
+    .map((repo) => ({
+      type: 'repo',
+      label: 'Latest push',
+      title: repo.description || repo.name,
+      repo: repo.nameWithOwner,
+      url: repo.url,
+      date: repo.pushedAt
+    }));
+
+  return [...fromEvents, ...fromRepos].slice(0, MAX_ACTIVITY);
+};
 
 const main = async () => {
   if (!TOKEN) {
@@ -272,7 +303,7 @@ const main = async () => {
     },
     weeks: latestWeeks,
     languages: buildLanguages(repos),
-    activity: buildActivity(events)
+    activity: buildActivity(events, repos)
   };
 
   await writeFile(OUT_FILE, `${JSON.stringify(stats, null, 2)}\n`, 'utf8');

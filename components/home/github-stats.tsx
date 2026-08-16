@@ -272,7 +272,7 @@ const GithubStatsSection = () => {
               <div className="flex flex-col min-w-0">
                 <p className="text-gray-200 truncate">{item.title}</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  {item.label} in{' '}
+                  {item.label} ·{' '}
                   <a href={item.url} target="_blank" rel="noreferrer" className="text-gradient font-medium">
                     {item.repo}
                   </a>{' '}
