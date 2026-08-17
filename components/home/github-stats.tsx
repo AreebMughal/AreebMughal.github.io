@@ -2,6 +2,7 @@ import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { gsap, Linear } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { GITHUB_STATS, MENULINKS } from '../../constants';
+import { NO_MOTION_PREFERENCE_QUERY } from 'pages';
 
 // Empty -> brightest, derived from the site's .text-gradient (#6dd5ed -> #2193b0).
 const LEVEL_COLORS = ['#1F2937', '#0E4B5E', '#157C97', '#2193B0', '#6DD5ED'];
@@ -53,7 +54,9 @@ const GithubStatsSection = () => {
     { label: `Contributions in ${totals.latestYear}`, value: totals.contributionsLatestYear },
     { label: 'Current streak', value: totals.currentStreak, suffix: totals.currentStreak === 1 ? ' day' : ' days' },
     { label: 'Longest streak', value: totals.longestStreak, suffix: totals.longestStreak === 1 ? ' day' : ' days' },
-    { label: 'Public repositories', value: totals.repositories }
+    // Counts private repos too once a read:user token is configured, so the
+    // label stays accurate either way.
+    { label: 'Repositories', value: totals.repositories }
   ];
 
   useEffect(() => {
@@ -73,8 +76,11 @@ const GithubStatsSection = () => {
     return () => trigger.kill();
   }, [targetSection]);
 
-  // Count-up runs once when the tiles scroll into view.
+  // Count-up runs once when the tiles scroll into view. The markup already
+  // carries the real figures, so this only ever animates up to what is there.
   useEffect(() => {
+    if (!window.matchMedia(NO_MOTION_PREFERENCE_QUERY).matches) return undefined;
+
     const counters = gsap.utils.toArray<HTMLElement>(targetSection.current.querySelectorAll('.stat-value'));
 
     const triggers = counters.map((counter) => {
@@ -86,7 +92,8 @@ const GithubStatsSection = () => {
         trigger: counter,
         start: 'top 90%',
         once: true,
-        onEnter: () =>
+        onEnter: () => {
+          counter.textContent = `0${suffix}`;
           gsap.to(proxy, {
             value: target,
             duration: 1.6,
@@ -94,9 +101,14 @@ const GithubStatsSection = () => {
             onUpdate: () => {
               counter.textContent = `${Math.round(proxy.value).toLocaleString('en-US')}${suffix}`;
             }
-          })
+          });
+        }
       });
     });
+
+    // The pinned projects section changes the page height after mount, which
+    // otherwise leaves these triggers measuring against stale positions.
+    ScrollTrigger.refresh();
 
     return () => triggers.forEach((trigger) => trigger.kill());
   }, [targetSection]);
@@ -116,12 +128,14 @@ const GithubStatsSection = () => {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
       {tiles.map((tile) => (
         <div key={tile.label} className="seq bg-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+          {/* Renders the real figure server-side; the count-up is an
+              enhancement, so a trigger that never fires can't strand it at 0. */}
           <p
-            className="text-4xl md:text-5xl font-bold text-gradient"
+            className="stat-value text-4xl md:text-5xl font-bold text-gradient"
             data-value={tile.value}
             data-suffix={tile.suffix || ''}
           >
-            {`0${tile.suffix || ''}`}
+            {`${tile.value.toLocaleString('en-US')}${tile.suffix || ''}`}
           </p>
           <p className="text-gray-200 text-sm mt-3 tracking-wide">{tile.label}</p>
         </div>
@@ -185,11 +199,11 @@ const GithubStatsSection = () => {
           ))}
 
           {weeks.map((week, weekIndex) =>
-            week.map((day, dayIndex) => (
+            week.map((day) => (
               <rect
                 key={day.date}
                 x={LABEL_GUTTER + weekIndex * CELL_STEP}
-                y={MONTH_BAR + dayIndex * CELL_STEP}
+                y={MONTH_BAR + new Date(`${day.date}T00:00:00Z`).getUTCDay() * CELL_STEP}
                 width={CELL}
                 height={CELL}
                 rx={2}

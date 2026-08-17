@@ -18,24 +18,43 @@ const MAX_LANGUAGES = 6;
 const MAX_ACTIVITY = 5;
 const HEATMAP_WEEKS = 53;
 
-const graphql = async (query, variables) => {
-  const res = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Content-Type': 'application/json',
-      'User-Agent': USERNAME
-    },
-    body: JSON.stringify({ query, variables })
-  });
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  if (!res.ok) throw new Error(`GraphQL ${res.status}: ${await res.text()}`);
+/** GitHub returns transient 5xx and secondary rate limits often enough to matter in CI. */
+const withRetry = async (label, fn, attempts = 4) => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const retryable = /\b(429|500|502|503|504)\b/.test(err.message) || err.name === 'TypeError';
+      if (!retryable || attempt >= attempts) throw err;
 
-  const body = await res.json();
-  if (body.errors) throw new Error(`GraphQL: ${body.errors.map((e) => e.message).join('; ')}`);
-
-  return body.data;
+      const delay = 1000 * 2 ** (attempt - 1);
+      console.warn(`[github-stats] ${label} failed (attempt ${attempt}/${attempts}), retrying in ${delay}ms`);
+      await sleep(delay);
+    }
+  }
 };
+
+const graphql = (query, variables) =>
+  withRetry('GraphQL', async () => {
+    const res = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        'Content-Type': 'application/json',
+        'User-Agent': USERNAME
+      },
+      body: JSON.stringify({ query, variables })
+    });
+
+    if (!res.ok) throw new Error(`GraphQL ${res.status}: ${await res.text()}`);
+
+    const body = await res.json();
+    if (body.errors) throw new Error(`GraphQL: ${body.errors.map((e) => e.message).join('; ')}`);
+
+    return body.data;
+  });
 
 const rest = async (endpoint) => {
   const res = await fetch(`https://api.github.com${endpoint}`, {
@@ -244,36 +263,55 @@ const main = async () => {
   const { user } = await graphql(PROFILE_QUERY, { login: USERNAME });
   const years = user.contributionsCollection.contributionYears;
 
-  const yearlyCollections = await Promise.all(
-    years.map(async (year) => {
-      const data = await graphql(YEAR_QUERY, {
-        login: USERNAME,
-        from: `${year}-01-01T00:00:00Z`,
-        to: `${year}-12-31T23:59:59Z`
-      });
+  // Queried one year at a time rather than in parallel: the fan-out trips
+  // secondary rate limits, and crashed libuv on Windows.
+  const yearlyCollections = [];
+  for (const year of years) {
+    const data = await graphql(YEAR_QUERY, {
+      login: USERNAME,
+      from: `${year}-01-01T00:00:00Z`,
+      to: `${year}-12-31T23:59:59Z`
+    });
 
-      return { year, collection: data.user.contributionsCollection };
-    })
-  );
+    yearlyCollections.push({ year, collection: data.user.contributionsCollection });
+  }
 
   // Newest year first is what GitHub returns; sort so index 0 is always the latest.
   yearlyCollections.sort((a, b) => b.year - a.year);
   const latest = yearlyCollections[0].collection;
 
-  const allDays = yearlyCollections.flatMap(({ collection }) =>
-    collection.contributionCalendar.weeks.flatMap((week) =>
-      week.contributionDays.map((day) => ({ date: day.date, count: day.contributionCount }))
-    )
-  );
+  // GitHub returns the whole calendar year, so the current year arrives padded
+  // with days that have not happened yet. Left in, those trailing zeros reset
+  // the current streak to 0 and fill the heatmap's right edge with empty future
+  // cells. Everything after today is dropped before any of it is used.
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Adjacent years overlap on the week that straddles 31 December, so dedupe by
+  // date rather than concatenating each year's weeks.
+  const byDate = new Map();
+  for (const { collection } of yearlyCollections) {
+    for (const week of collection.contributionCalendar.weeks) {
+      for (const day of week.contributionDays) {
+        if (day.date <= today) byDate.set(day.date, day.contributionCount);
+      }
+    }
+  }
+
+  const allDays = [...byDate.entries()]
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const { current, longest } = calculateStreaks(allDays);
 
-  // The heatmap shows a rolling window ending on the most recent recorded day.
-  const latestWeeks = yearlyCollections
-    .flatMap(({ collection }) => collection.contributionCalendar.weeks)
-    .sort((a, b) => a.contributionDays[0].date.localeCompare(b.contributionDays[0].date))
-    .slice(-HEATMAP_WEEKS)
-    .map((week) => week.contributionDays.map((day) => ({ date: day.date, count: day.contributionCount })));
+  // Group into Sunday-started weeks; the component positions each cell by its
+  // real weekday, so partial weeks at either end stay aligned.
+  const weeks = [];
+  for (const day of allDays) {
+    if (new Date(`${day.date}T00:00:00Z`).getUTCDay() === 0 || weeks.length === 0) weeks.push([]);
+    weeks[weeks.length - 1].push(day);
+  }
+
+  const latestWeeks = weeks.slice(-HEATMAP_WEEKS);
 
   const events = await rest(`/users/${USERNAME}/events/public?per_page=60`).catch((err) => {
     console.warn(`[github-stats] Activity feed unavailable: ${err.message}`);
@@ -298,6 +336,10 @@ const main = async () => {
       repositories: user.repositories.totalCount,
       stars: repos.reduce((sum, repo) => sum + repo.stargazerCount, 0),
       followers: user.followers.totalCount,
+      // Private contributions are already folded into the calendar totals when
+      // "Include private contributions on my profile" is enabled; this is the
+      // private-only slice, kept for reference.
+      privateContributionsLatestYear: latest.restrictedContributionsCount,
       currentStreak: current,
       longestStreak: longest
     },
