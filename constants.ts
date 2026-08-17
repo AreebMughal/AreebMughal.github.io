@@ -2,9 +2,9 @@ import { ESKILLS } from 'enum';
 import githubStats from './data/github-stats.json';
 
 export const METADATA = {
-  title: 'Areeb Arshad | Portfolio',
+  title: 'Areeb Arshad | Senior Full-Stack Software Engineer',
   description:
-    'I architect powerful backend systems that drive seamless user experiences, connecting logic, data, and design into scalable solutions.',
+    'Senior Full-Stack Software Engineer with 6+ years architecting scalable, secure systems for international clients — NestJS microservices, database design, and HIPAA-compliant healthcare platforms.',
   siteUrl: 'https://areebmughal.github.io/',
   previewImage: 'https://areebmughal.github.io/preview.png'
 };
@@ -86,12 +86,12 @@ export const MENULINKS = [
 ];
 
 export const TYPED_STRINGS = [
-  'I architect scalable applications',
-  'I engineer robust backend systems',
-  'I design high-performance database solutions',
-  'I craft responsive & modern UIs',
-  'I lead teams and deliver innovative software solutions',
-  'I adapt quickly and embrace new technologies with passion'
+  'I architect scalable microservices',
+  'I design databases that hold up under load',
+  'I build HIPAA-compliant healthcare platforms',
+  'I lead migrations without breaking production',
+  'I turn business requirements into resilient systems',
+  'I mentor engineers into stronger engineers'
 ];
 
 export const EMAIL = 'areebarshad.m@gmail.com';
@@ -110,8 +110,14 @@ export interface IProject {
   blurImage: string;
   description: string;
   gradient: [string, string];
-  url: string;
+  /** Omit when the product has no public URL — the tile renders unlinked. */
+  url?: string;
   tech: string[];
+  /**
+   * True when `image` is generated cover art rather than a product screenshot.
+   * Keeps the distinction explicit in the data instead of implied by a path.
+   */
+  isCoverArt?: boolean;
 }
 
 export const PROJECTS: IProject[] = [
@@ -150,6 +156,42 @@ export const PROJECTS: IProject[] = [
     gradient: ['#003052', '#167187'],
     url: 'https://opportunitiesbridge.com/',
     tech: [ESKILLS.TYPESCRIPT, ESKILLS.NEXT, ESKILLS.REDUX, ESKILLS.TAILWIND, ESKILLS.MONGODB]
+  },
+  {
+    name: 'Toothy.ai',
+    image: '/projects/covers/toothy-ai.svg',
+    blurImage: '/projects/covers/toothy-ai.svg',
+    description: 'AI-powered RPA automating dental insurance verification and revenue-cycle workflows',
+    gradient: ['#2B2F77', '#6C5CE0'],
+    isCoverArt: true,
+    tech: [ESKILLS.PYTHON, ESKILLS.NESTJS, ESKILLS.SUPABASE, ESKILLS.POSTGRESQL]
+  },
+  {
+    name: 'RevConductor',
+    image: '/projects/covers/revconductor.svg',
+    blurImage: '/projects/covers/revconductor.svg',
+    description: 'Industry cloud connecting the end-to-end supply chain for high-tech manufacturers',
+    gradient: ['#6B3410', '#C98B2E'],
+    isCoverArt: true,
+    tech: [ESKILLS.GRAPHQL, ESKILLS.POSTGRESQL, ESKILLS.NODEJS, ESKILLS.DOCKER]
+  },
+  {
+    name: 'Lahebo',
+    image: '/projects/covers/lahebo.svg',
+    blurImage: '/projects/covers/lahebo.svg',
+    description: 'GRC platform tracking Australian legislative change against business risk and actions',
+    gradient: ['#2E3A4F', '#5B7BA6'],
+    isCoverArt: true,
+    tech: [ESKILLS.NESTJS, ESKILLS.POSTGRESQL, ESKILLS.TYPESCRIPT]
+  },
+  {
+    name: 'Temple Day Spa',
+    image: '/projects/covers/temple-day-spa.svg',
+    blurImage: '/projects/covers/temple-day-spa.svg',
+    description: 'Client management and appointment scheduling with room and therapist preferences',
+    gradient: ['#5C3A4E', '#B07A94'],
+    isCoverArt: true,
+    tech: [ESKILLS.EXPRESS, ESKILLS.MONGODB, ESKILLS.REACT, ESKILLS.MUI, ESKILLS.REDUX]
   }
 ];
 
@@ -165,7 +207,15 @@ export const SKILLS = {
     ESKILLS.FLASK,
     ESKILLS.SOCKETS
   ],
-  database: [ESKILLS.MONGODB, ESKILLS.POSTGRESQL, ESKILLS.MYSQL, ESKILLS.REDIS, ESKILLS.FIREBASE],
+  database: [
+    ESKILLS.POSTGRESQL,
+    ESKILLS.MONGODB,
+    ESKILLS.MYSQL,
+    ESKILLS.SQL,
+    ESKILLS.REDIS,
+    ESKILLS.SUPABASE,
+    ESKILLS.FIREBASE
+  ],
   frontend: [
     ESKILLS.JAVASCRIPT,
     ESKILLS.TYPESCRIPT,
@@ -179,9 +229,12 @@ export const SKILLS = {
     ESKILLS.SVG,
     ESKILLS.HTML,
     ESKILLS.CSS,
-    ESKILLS.SASS
+    ESKILLS.SASS,
+    ESKILLS.GASP
   ],
-  cloud: [ESKILLS.AWS, ESKILLS.EC2, ESKILLS.LAMBDA, ESKILLS.GCP, ESKILLS.DOCKER],
+  // EC2 and GCP were listed here but have no icon in public/skills, so they
+  // rendered as broken images. AWS covers EC2; GCP is not on the CV.
+  cloud: [ESKILLS.AWS, ESKILLS.LAMBDA, ESKILLS.DOCKER],
   integration: [
     ESKILLS.STRIPE,
     ESKILLS.SENDGRID,
@@ -208,6 +261,8 @@ export const SKILLS_MAP: Record<ESKILLS, string> = {
   mongodb: 'MongoDB',
   postgresql: 'PostgreSQL',
   mysql: 'MySQL',
+  sql: 'SQL',
+  supabase: 'Supabase',
   redis: 'Redis',
   react: 'React',
   next: 'Next.js',
@@ -271,11 +326,12 @@ export const TIMELINE: Array<TimelineNodeV2> = [
   },
   {
     type: NodeTypes.CHECKPOINT,
-    title: 'Senior Software Engineer - Full Stack',
+    title: 'Senior Software Engineer — Full Stack',
     size: ItemSize.SMALL,
-    subtitle: 'Worked on microservices and frontend for a health-care platform',
+    subtitle:
+      'Brackets Private Limited · Dec 2024 – Present — Own backend architecture and database design across NestJS microservices for HIPAA-compliant healthcare platforms, and run the CMIT internship programme',
     image: '/timeline/brackets.svg',
-    slideImage: '/timeline/mern.png',
+    slideImage: '/timeline/brackets-mentor.png',
     shouldDrawLine: true,
     alignment: Branch.LEFT
   },
@@ -291,9 +347,10 @@ export const TIMELINE: Array<TimelineNodeV2> = [
   },
   {
     type: NodeTypes.CHECKPOINT,
-    title: 'Executive Software Engineer',
+    title: 'Executive Software Engineer — Full Stack',
     size: ItemSize.SMALL,
-    subtitle: 'Worked on microservice based Diagnostic Product',
+    subtitle:
+      'Rendream · Jun – Dec 2024 — Built microservices features across Socket.IO, S3 chunked uploads and MySQL data handling',
     image: '/timeline/rendream.svg',
     slideImage: '/timeline/tech-tehwar.jpg',
     shouldDrawLine: true,
@@ -301,9 +358,10 @@ export const TIMELINE: Array<TimelineNodeV2> = [
   },
   {
     type: NodeTypes.CHECKPOINT,
-    title: 'Software Engineer',
+    title: 'Software Engineer — Full Stack',
     size: ItemSize.SMALL,
-    subtitle: 'Lead different projects and teams, built scalable solutions',
+    subtitle:
+      'ZAPTA Technologies · Oct 2022 – Jun 2024 — Led cross-functional teams across concurrent client projects, owning technical direction, code quality and delivery',
     image: '/timeline/zapta-blue.svg',
     slideImage: '/timeline/gift-zapta.jpg',
     shouldDrawLine: true,
@@ -311,23 +369,6 @@ export const TIMELINE: Array<TimelineNodeV2> = [
   },
   {
     type: NodeTypes.CONVERGE
-  },
-  {
-    type: NodeTypes.CHECKPOINT,
-    title: '2023',
-    size: ItemSize.LARGE,
-    shouldDrawLine: false,
-    alignment: Branch.LEFT
-  },
-  {
-    type: NodeTypes.CHECKPOINT,
-    title: 'Software Engineer',
-    size: ItemSize.SMALL,
-    subtitle: 'Lead different projects and teams, built scalable solutions',
-    image: '/timeline/zapta-blue.svg',
-    slideImage: '/timeline/session.jpg',
-    shouldDrawLine: true,
-    alignment: Branch.LEFT
   },
   {
     type: NodeTypes.CHECKPOINT,
@@ -343,7 +384,8 @@ export const TIMELINE: Array<TimelineNodeV2> = [
     type: NodeTypes.CHECKPOINT,
     title: 'Associate Software Engineer',
     size: ItemSize.SMALL,
-    subtitle: 'Developed and maintained scalable solutions',
+    subtitle:
+      'ZAPTA Technologies — Designed database schemas and delivered production features end to end before stepping up to Software Engineer',
     image: '/timeline/zapta-blue.svg',
     slideImage: '/timeline/award.jpg',
     shouldDrawLine: true,
@@ -351,26 +393,33 @@ export const TIMELINE: Array<TimelineNodeV2> = [
   },
   {
     type: NodeTypes.CHECKPOINT,
-    title: 'Software Engineer Graduate',
+    title: 'BS Software Engineering',
     size: ItemSize.SMALL,
-    subtitle: 'Graduated in Software Engineering from GIFT University',
+    subtitle: 'GIFT University · Sep 2018 – Oct 2022 — Graduated with a 3.92 CGPA',
     image: '/timeline/gift-uni.svg',
     slideImage: '/timeline/gift.png',
     shouldDrawLine: true,
     alignment: Branch.RIGHT
   },
   {
-    type: NodeTypes.CHECKPOINT,
-    title: 'MERN Stack Developer',
-    size: ItemSize.SMALL,
-    subtitle: 'Worked on multiple projects with MERN stack',
-    // image: '/timeline/octanner.svg',
-    slideImage: '/timeline/mern.png',
-    shouldDrawLine: true,
-    alignment: Branch.RIGHT
+    type: NodeTypes.CONVERGE
   },
   {
-    type: NodeTypes.CONVERGE
+    type: NodeTypes.CHECKPOINT,
+    title: '2021',
+    size: ItemSize.LARGE,
+    shouldDrawLine: false,
+    alignment: Branch.LEFT
+  },
+  {
+    type: NodeTypes.CHECKPOINT,
+    title: 'Software Engineer',
+    size: ItemSize.SMALL,
+    subtitle:
+      'Saigma Strategic Systems · May 2021 – Aug 2022 — Built and maintained production MERN stack applications, designing schemas and architecture end to end',
+    slideImage: '/timeline/mern.png',
+    shouldDrawLine: true,
+    alignment: Branch.LEFT
   }
 ];
 

@@ -16,6 +16,8 @@ export enum ESKILLS {
   MYSQL = 'mysql',
   REDIS = 'redis',
   FIREBASE = 'firebase',
+  SUPABASE = 'supabase',
+  SQL = 'sql',
 
   // Frontend
   REACT = 'react',

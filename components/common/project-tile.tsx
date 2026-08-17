@@ -12,6 +12,7 @@ const ProjectTile = ({ project, animationEnabled }: { project: IProject; animati
     image,
     blurImage,
     description,
+    isCoverArt,
     gradient: [stop1, stop2]
   } = project;
 
@@ -75,18 +76,23 @@ const ProjectTile = ({ project, animationEnabled }: { project: IProject; animati
       placeholder="blur"
       blurDataURL={blurImage}
       src={image}
-      alt={name}
+      alt={isCoverArt ? `${name} — abstract cover artwork` : `${name} screenshot`}
       layout="fill"
       className={`${styles.ProjectImg} z-0`}
     />
   );
 
+  // Projects without a public URL render as a plain container rather than an
+  // anchor, so the tile never behaves like a link that goes nowhere.
+  const Wrapper = project.url ? 'a' : 'div';
+  const wrapperProps = project.url
+    ? { href: project.url, target: '_blank', rel: 'noreferrer' as const }
+    : {};
+
   return (
-    <a
-      href={project.url}
-      target="_blank"
-      rel="noreferrer"
-      className="link overflow-hidden rounded-3xl snap-start"
+    <Wrapper
+      {...wrapperProps}
+      className={`${project.url ? 'link ' : ''}overflow-hidden rounded-3xl snap-start`}
       style={{
         maxWidth: animationEnabled ? 'calc(100vw - 2rem)' : 'calc(100vw - 4rem)',
         flex: '1 0 auto',
@@ -115,7 +121,7 @@ const ProjectTile = ({ project, animationEnabled }: { project: IProject; animati
         {renderTechIcons(tech)}
         {renderDescription(description)}
       </div>
-    </a>
+    </Wrapper>
   );
 };
 

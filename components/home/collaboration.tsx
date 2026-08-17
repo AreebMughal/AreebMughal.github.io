@@ -86,7 +86,7 @@ const CollaborationSection = () => {
 
       {renderTitle()}
 
-      {renderSlidingText(' Backend Development  Frontend Development ', 'mt-6 md:mt-8 ui-right')}
+      {renderSlidingText(' Microservices  Backend Development  Frontend Development ', 'mt-6 md:mt-8 ui-right')}
     </section>
   );
 };

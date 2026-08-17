@@ -47,11 +47,12 @@ const AboutSection = () => {
   const renderQuotes = (): React.ReactNode => (
     <h1 ref={quoteRef} className="font-medium text-2xl sm:text-4xl md:text-5xl">
       <span className={`about-1 leading-tight ${willChange ? 'will-change-opacity' : ''}`}>
-        Driven by a passion for building robust system architecture and APIs that power seamless digital experiences.{' '}
+        Senior Full-Stack Engineer with 6+ years architecting secure, high-performance systems for clients across the
+        globe.{' '}
       </span>
       <span className={`about-2 leading-tight ${willChange ? 'will-change-opacity' : ''}`}>
-        I take ownership of building scalable services and love bridging backend logic with smooth, purposeful user
-        experiences.
+        I work deepest in NestJS microservices, database design, and HIPAA-compliant healthcare platforms — taking
+        ownership of the architecture that makes a product feel effortless.
       </span>
     </h1>
   );

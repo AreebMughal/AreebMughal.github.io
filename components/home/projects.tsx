@@ -99,8 +99,8 @@ const ProjectsSection = ({ isDesktop }: IDesktop) => {
       <p className="section-title-sm seq">PROJECTS</p>
       <h1 className="section-heading seq mt-2">My Works</h1>
       <h2 className="text-2xl md:max-w-4xl w-full seq max-w-sm mt-2">
-        I have contributed in over 15+ projects ranging from Frontend development and Backend development. Have a look
-        at some of them.
+        I&#39;ve contributed to 15+ projects across backend architecture and frontend delivery — from HIPAA-compliant
+        healthcare platforms to accounting and compliance systems. Here are a few of them.
       </h2>
     </div>
   );
