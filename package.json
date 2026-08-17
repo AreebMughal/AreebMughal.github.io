@@ -1,13 +1,21 @@
 {
-  "name": "folio",
+  "name": "areeb-arshad-portfolio",
   "version": "2.0.0",
   "private": true,
+  "description": "Personal portfolio of Areeb Arshad, Senior Full-Stack Software Engineer.",
+  "author": "Areeb Arshad <areebarshad.m@gmail.com> (https://areebmughal.github.io)",
+  "homepage": "https://areebmughal.github.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AreebMughal/AreebMughal.github.io.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "fetch:stats": "node scripts/fetch-github-stats.mjs",
+    "gen:covers": "node scripts/generate-project-covers.mjs",
     "export": "next build && next export",
     "deploy:build": "npm run fetch:stats && npm run export && touch out/.nojekyll"
   },
@@ -30,6 +38,5 @@
     "tailwindcss": "^3.1.4",
     "typescript": "^4.2.4"
   },
-  "license": "MIT",
-  "copyright.owner": "Ayush Singh"
+  "license": "MIT"
 }

@@ -33,7 +33,7 @@ const Footer = () => {
           href="/Areeb-Resume.pdf"
         ></Button>
       </div>
-      <h2 className="text-center text-sm sm:text-base mt-8">Designed and Developed with ❤️ by Areeb</h2>
+      <h2 className="text-center text-sm sm:text-base mt-8">Built with ❤️ by Areeb Arshad</h2>
     </>
   );
 
